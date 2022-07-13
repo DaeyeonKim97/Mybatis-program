@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MenuMapper">
+	
+	<!-- 조회한 컬럼과 DTO를 매핑시키기 위한 설정 -->
+	<!--#규칙에 맞게 setter method를 찾아 매핑시킴 -->
+	<resultMap id="menuResultMap" type="com.dykim.crud.xmlconfig.MenuDTO">
+		<id property="code" column="MENU_CODE"/>
+		<result property="name" column = "MENU_NAME"/>
+		<result property="price" column = "MENU_PRICE"/>
+		<result property="categoryCode" column="CATEGORY_CODE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	</resultMap>
+	
+	<!-- 결과집합을 위에 선언해주어야함. 어떠한DTO에 매칭시켜 줄 것인지? -->
+	<select id="selectAllMenu" resultMap="menuResultMap"> 
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		ORDER BY A.MENU_CODE
+	</select>
+</mapper>

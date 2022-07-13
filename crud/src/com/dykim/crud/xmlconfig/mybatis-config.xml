@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-config.dtd">
+
+ <configuration>
+ 	<environments default="dev">
+ 		<environment id = "dev">
+	 		<!-- JDBC 혹은 MANAGED중 한가지 선택 -->
+	 		<transactionManager type = "JDBC"/>
+	 		<!-- POOOLED or UNPOOLED-->
+	 		<dataSource type = "POOLED">
+	 			<property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+	 			<property name="url" value="jdbc:oracle:thin:@mtvsdb_medium?TNS_ADMIN=/Users/dykim/keys/Wallet_MTVSdb"/>
+	 			<property name="username" value="DYKIM"/>
+	 			<property name="password" value="Rlaeodus1130"/>
+	 		</dataSource>
+ 		</environment>
+ 	</environments>
+ 	
+ 	<mappers>
+ 		<mapper resource="com/dykim/crud/xmlconfig/mapper.xml"/>
+ 	</mappers>
+ </configuration>
