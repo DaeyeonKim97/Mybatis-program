@@ -32,7 +32,7 @@ public class Application {
 		
 		System.out.println(sqlSession);
 		
-		Mapper mapper = sqlSession.getMapper(Mapper.class);
+		Mapper mapper = sqlSession.getMapper(Mapper.class); //MapperProxy를 만들어줌 (대신 역할을 수행), MapperProxy가 이미 Override를 다 해놓았음.
 
 		java.util.Date date = mapper.selectSysdate();
 		
