@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mabatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dykim.crud.remix.MenuMapper">
+
+<!-- Mapper Class하고 파일 이름과 폴더 디렉토리 구조가 같아야 자동연결이됨. -->
+<!-- build path에 최상위 경로로 추가 되어있어야 됨.  -->
+	
+	<!-- 조회한 컬럼과 DTO를 매핑시키기 위한 설정 -->
+	<!--#규칙에 맞게 setter method를 찾아 매핑시킴 -->
+	<resultMap id="menuResultMap" type="com.dykim.crud.remix.MenuDTO">
+		<id property="code" column="MENU_CODE"/>
+		<result property="name" column = "MENU_NAME"/>
+		<result property="price" column = "MENU_PRICE"/>
+		<result property="categoryCode" column="CATEGORY_CODE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	</resultMap>
+	
+	<!-- 결과집합을 위에 선언해주어야함. 어떠한DTO에 매칭시켜 줄 것인지? -->
+	<select id="selectAllMenu" resultMap="menuResultMap"> 
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		ORDER BY A.MENU_CODE
+	</select>
+	
+	<!-- 별칭에 대한 부분은 Mybatis문서에 나와있음 -->
+	<!-- 
+		select 엘리먼트는 resultMap 혹은 resultType을 둘 중 하나는 반드시 필수 속성으로 작성해야 한다.
+		resultMap : 위에 생성한 resultMap을 리턴 타입으로 하는 경우
+		resultType : 이미 정의되어 있는 타입을 이용하여 리턴 타입으로 이용하는 경우
+	 -->
+	<select id="selectMenuByCode" parameterType="_int" resultMap="menuResultMap">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		  AND A.MENU_CODE = #{ code }
+	</select>
+	
+	<!-- insert, update, delete의 경우 resultType을 작성하지 않는다. (기본 _int로 반환한다) -->
+	<insert id="insertMenu" parameterType="com.dykim.crud.remix.MenuDTO">
+		INSERT
+			INTO TBL_MENU A
+		(
+		  A.MENU_CODE
+		, A.MENU_NAME
+		, A.MENU_PRICE
+		, A.CATEGORY_CODE
+		, A.ORDERABLE_STATUS
+		)
+		VALUES
+		(
+		  SEQ_MENU_CODE.NEXTVAL
+		, #{ name }
+		, #{ price }
+		, #{ categoryCode }
+		, 'Y'
+		)
+	</insert>
+	
+	<update id="modifyMenu" parameterType="com.dykim.crud.remix.MenuDTO">
+		UPDATE TBL_MENU
+		   SET 
+			  MENU_NAME = #{name}
+			, MENU_PRICE = #{price}
+			, CATEGORY_CODE = #{categoryCode}
+		 WHERE MENU_CODE = #{code}
+	</update>
+	
+	<update id="deleteMenu" parameterType="com.dykim.crud.remix.MenuDTO">
+		UPDATE TBL_MENU
+		   SET 
+			  ORDERABLE_STATUS = 'N'
+		 WHERE MENU_CODE = #{code}
+	</update>
+</mapper>
+
+
