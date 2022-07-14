@@ -1,6 +1,5 @@
 package com.dykim.crud.xmlconfig;
 
-import java.awt.Label;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
