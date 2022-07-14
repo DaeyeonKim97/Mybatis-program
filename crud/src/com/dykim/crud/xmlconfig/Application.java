@@ -1,6 +1,8 @@
 package com.dykim.crud.xmlconfig;
 
 import java.awt.Label;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Application {
@@ -25,15 +27,74 @@ public class Application {
 				case 1: 
 					menuController.selectAllMenu(); 
 					break;
-				case 2: break;
-				case 3: break;
-				case 4: break;
-				case 5: break;
+				case 2: 
+					menuController.selectMenuByCode(inputMenucode());
+					break;
+				case 3: 
+					menuController.registMenu(inputMenu());
+					break;
+				case 4:
+					menuController.modifyMenu(inputModifyMenu());
+					break;
+				case 5:
+					menuController.deleteMenu(inputMenucode());
+					break;
 				default: break;
 			}
 			
 			
 		} while(true);
 		
+	}
+	
+	private static Map<String, String> inputModifyMenu() {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("수정하실 메뉴 코드를 입력하세요 : ");
+		String code = sc.nextLine();
+		System.out.print("메뉴 이름을 입력하세요 : ");
+		String name = sc.nextLine();
+		System.out.print("메뉴 가격을 입력하세요 : ");
+		String price = sc.nextLine();
+		System.out.print("카테고리 코드를 입력하세요 : ");
+		String categoryCode = sc.nextLine();
+		
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put("code",code);
+		parameter.put("name", name);
+		parameter.put("price", price);
+		parameter.put("categoryCode", categoryCode);
+		
+		return parameter;
+	}
+
+	private static Map<String,String> inputMenu() {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("메뉴 이름을 입력하세요 : ");
+		String name = sc.nextLine();
+		System.out.print("메뉴 가격을 입력하세요 : ");
+		String price = sc.nextLine();
+		System.out.print("카테고리 코드를 입력하세요 : ");
+		String categoryCode = sc.nextLine();
+		
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put("name", name);
+		parameter.put("price", price);
+		parameter.put("categoryCode", categoryCode);
+		
+		
+		return parameter;
+	}
+
+	//private static은 내부 연산을 위한 메소드 
+	//보통 map으로 파라미터를 넘김.
+	private static Map<String, String> inputMenucode() { 
+		Scanner sc = new Scanner(System.in);
+		System.out.print("메뉴코드를 입력하세요 : ");
+		String code = sc.nextLine();
+		
+		Map<String, String> parameter = new HashMap<>();
+		parameter.put("code",code);
+		
+		return parameter;
 	}
 }

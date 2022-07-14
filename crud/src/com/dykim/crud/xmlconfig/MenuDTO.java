@@ -41,7 +41,10 @@ public class MenuDTO {
 		return price;
 	}
 
-	public void setPrice(int price) {
+	public void setPrice(int price) throws Exception {
+		if(price < 0) {
+			throw new Exception("가격이 음수로 입력되었습니다.");
+		}
 		this.price = price;
 	}
 
