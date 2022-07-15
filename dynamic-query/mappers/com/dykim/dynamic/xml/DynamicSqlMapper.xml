@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.dykim.dynamic.xml.DynamicSqlMapper">
+	<resultMap type="com.dykim.dynamic.common.MenuDTO" id="menuResultMap">
+		<id property="code" column="MENU_CODE"/>
+		<result property="name" column="MENU_NAME"/>
+		<result property="price" column="MENU_PRICE"/>
+		<result property="categoryCode" column="CATEGORY_CODE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	</resultMap>
+
+
+	<select id="selectMenuByPrice" parameterType="hashmap" resultMap = "menuResultMap">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		<if test="price gte 0 and price lte 10000">
+		<![CDATA[
+			AND A.MENU_PRICE < #{price}		
+		]]>
+		</if>
+		<if test="price gt 10000 and price lte 20000">
+			AND A.MENU_PRICE BETWEEN 10000 AND #{price}
+		</if>
+		<if test="price gt 20000 and price lte 30000">
+			AND A.MENU_PRICE BETWEEN 20000 AND #{price}
+		</if>
+		<if test="price gt 30000">
+			AND A.MENU_PRICE BETWEEN 30000 AND #{price}
+		</if>
+		ORDER BY A.MENU_CODE
+		
+	</select>
+	
+	<select id="searchMenu" parameterType="SearchCriteria" resultMap = "menuResultMap">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		<if test="condition == 'category'">
+			JOIN TBL_CATEGORY B ON (A.CATEGORY_CODE = B.CATEGORY_CODE)
+		</if>
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		<if test = "condition == 'name'">
+			AND A.MENU_NAME LIKE '%' || #{value} || '%'
+		</if>
+		<if test="condition =='category'">
+			AND B.CATEGORY_NAME = #{value}
+		</if>
+		ORDER BY A.MENU_CODE
+	</select>
+	
+	<select id="searchMenuBySupCategory" parameterType="SearchCriteria" resultMap="menuResultMap">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		<choose >
+		<when test="value == '식사'">
+			AND A.CATEGORY_CODE IN (4,5,6,7)
+		</when>
+		<when test="value == '음료'">
+			AND A.CATEGORY_CODE IN (8,9,10)
+		</when>
+		<otherwise>
+			AND A.CATEGORY_CODE IN (11,12)
+		</otherwise>
+		</choose>
+		ORDER BY A.MENU_CODE
+	</select>
+	
+	<select id="searchMenuByRandomCode" parameterType="hashmap" resultMap="menuResultMap">
+		SELECT /* com.dykim.dynamic.xml.DynamicSqlMapper#searchMenuByRandomCode */
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+		  AND A.MENU_CODE IN
+		<foreach collection="randomMenuCodeList" item="menuCode" open="(" close=")" separator=", ">
+			#{menuCode}
+		</foreach>
+		
+		<!-- 정적 필드 혹은 정적 메소드에 직접 접근해서 사용
+			정적필드 접근 : @풀클래스명@필드명
+			정적메소드 접근 @풀클래스명@메소드명() -->
+		<!-- <foreach collection="@com.dykim.dynamic.xml.Application@createRandomMenuCodeList()"
+			item="menuCode" open="(" close=")" separator=", ">
+			#{menuCode}	
+		</foreach> -->
+	</select>
+	
+	<select id="searchMenuBycodeOrSearchAll" resultMap="menuResultMap">
+		SELECT /* com.dykim.dynamic.xml.DynamicSqlMapper#searchMenuByRandomCode */
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		<if test="condition != null and condition eq 'menuCode'">
+			<where> <!-- Where절을 자동 추가. (where절이 없을 경우) -->
+				A.MENU_CODE = #{value}
+			</where>
+		</if>
+	</select>
+	
+	<select id="searchMenuByNameOrCategory" resultMap="menuResultMap">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		<!-- Where를 if문안에 사용하고 다른 if문에서 and를 사용하는 경우 where가 붙지 않는 경우가있다. -->
+		
+		<!-- where 이용  -->
+		<!-- <where>
+			<if test="nameValue != null">
+				A.MENU_NAME LIKE '%'|| #{nameValue} || '%'
+			</if>
+			<if test="categoryValue != null">
+				AND A.CATEGORY_CODE = #{categoryValue}
+			</if>
+		</where> -->
+		
+		<!-- trim -->
+		<trim prefix="WHERE" prefixOverrides = "AND|OR">
+			<if test="nameValue != null">
+				A.MENU_NAME LIKE '%'|| #{nameValue} || '%'
+			</if>
+			<if test="categoryValue != null">
+				AND A.CATEGORY_CODE = #{categoryValue}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- set 태그 이용 -->
+	<update id ="modifyMenu">
+		UPDATE
+			TBL_MENU A
+		<set>
+            <if test="name != null and name != ''">
+            	A.MENU_NAME = #{ name },
+            </if>
+
+            <if test="categoryCode != null and categoryCode gt 0">
+            	A.CATEGORY_CODE = #{ categoryCode },
+            </if>
+
+            <if test="orderableStatus != null and orderableStatus != ''">
+            	A.ORDERABLE_STATUS = #{ orderableStatus },
+            </if>
+		</set>
+		WHERE A.MENU_CODE = #{code}
+	</update>
+	
+	<!-- trim 이용 -->
+	<!-- <update id ="modifyMenu">
+		UPDATE
+			TBL_MENU A
+		<trim prefix="SET" prefixOverrides="," suffixOverrides=",">
+		<if test = "name != null and name != ''">
+			A.MENU_NAME = #{name} ,
+		</if>
+		<if test = "categoryCode != null and categoryCode gt 0 ''">
+			A.CATEGORY_CODE = #{categoryCode} ,
+		</if>
+		<if test = "orderableStatus != null and categoryCode !=''">
+			A.ORDERABLE_STATUS = #{orderableStatus}
+		</if>
+		</trim>
+		WHERE A.MENU_CODE = #{code}
+	</update> -->
+
+</mapper>
