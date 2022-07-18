@@ -4,14 +4,16 @@
   "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace = "com.dykim.mapperelement.xmlmapper.ElementTestMapper">
-	<resultMap type="com.dykim.mapperelement.common.MenuDTO" id="menuResultMap">
+	<resultMap type="com.dykim.mapperelement.common.MenuDTO" id="menuResultMap1">
 		<id property="code" column="MENU_CODE"/>
 		<result property="name" column="MENU_NAME"/>
 		<result property="price" column="MENU_PRICE"/>
 		<result property="categoryCode" column="CATEGORY_CODE"/>
-		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
 	</resultMap>
 	
+	<resultMap type="com.dykim.mapperelement.common.MenuDTO" id="menuResultMap2" extends="menuResultMap1">
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	</resultMap>
 	
 	<!-- mapper xml 에서 사용할 수 있는 엘리먼트는 총 9가지 이다. -->
 	<!-- 
@@ -53,4 +55,141 @@
 		FROM TBL_MENU A
 	</select>
 	
+	
+	<!-- 
+		2. <resultMap> 엘리먼트 
+		데이터베이스 결과 데이터를 객체에 로드하는 방법을 정의하는 엘리먼트이다.
+		resultMap 엘리먼트는 마이바티스에서 가장 중요하고 강력한 엘리먼트이다.
+		ResultSet 에서 데이터를 가져올 때 작성되는 JDBC코드를 대부분 줄여주는 역할을 담당한다.
+		또한 join 매핑과 같은 복잡한 코드는 굉장히 많은 코드가 필요하지만
+		resultMap은 간단한 구문에서는 관계 매핑이 필요하지 않지만,
+		복잡한 구문에서 관계를 서술하는 엘리먼트를 제공하여 이를 해결할 수 있도록 한다.	
+	 -->
+	 <!-- 
+	 	resultMap 엘리먼트는 4가지 속성을 설정할 수 있다.
+	 	1. id : 매핑 구분에서 결과 매핑을 사용할 때 여러 매핑에 대한 정보를 구분하기 위한 식별자 역할을 수행한다.
+	 	2. type : 결과 매핑을 적용한느 대상 객체 타입(매핑 구문의 결과 데이터를 저장할 자바 타입을 지정함)
+	 	3. extends : 자바의 상속처럼 기존에 정의된 매핑 결과를 상속받아 추가적인 매핑 정보로 확장할 때 사용한다. (부모 resultMap의 아이디 사용)
+	 	4. autoMapping : 결과 매핑을 자동 매핑을 할 것인지를 결정한다. (config에 설정한 전역 설정을 override 한다.)
+	 					 오토매핑 설정은 동일한 컬럼명이 있는 경우 위험성을 가지기 때문에 사용하지 않는 것이 안전하다.
+	  -->
+	<select id="selectResultMapTest" resultMap="menuResultMap2">
+		SELECT
+			  A.MENU_CODE
+			, A.MENU_NAME
+			, A.MENU_PRICE
+			, A.CATEGORY_CODE
+			, A.ORDERABLE_STATUS
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS
+	</select>
+	
+	
+	<!-- 2-1. resultMap의 하위 엘리먼트  -->
+	<!-- 
+		<id> : primary key를 매핑하기 위한 태그이다. (성능 향상)
+		<result> : pk가 아닌 일반 컬럼에 매핑하기 위한 태그이다.
+		<constructor> : 인스턴스화 되는 클래스의 생성자에 결과를 삽입하기 위해 사용한다. <idArg>, <arg> 하위 엘리먼트가 있다.
+		<association> : 복잡한 타입의 연관관계로 1:1 포함관계인 경우 사용한다.
+		<collection> : 복잡한 타입의 연관관계로 1:N 포함관계인 경우 사용한다.
+		<discriminator> : 조건에 따라 다른 resultMap이 매핑되도록 한다.
+	 -->
+	 
+	 <!-- 2-1-1 <constructor> 
+	 	기존 setter를 이용하는 방식이 아닌 constructor를 이용하는 방식이기 때문에 순서가 중요하다. -->
+	 <resultMap id="menuResultMap3" type="com.dykim.mapperelement.common.MenuDTO" >
+	 	<constructor>
+	 		<idArg column="MENU_CODE" javaType="_int"/>
+	 		<arg column="MENU_NAME" javaType="string"/>
+	 		<arg column="MENU_PRICE" javaType="_int"/>
+	 		<arg column="CATEGORY_CODE" javaType="_int"/>
+	 		<arg column="ORDERABLE_STATUS" javaType="string"/>
+	 	</constructor>
+	 </resultMap>
+	 
+	 <select id = "selectResultMapConstructorTest" resultMap = "menuResultMap3">
+	 	SELECT
+	 		  A.MENU_CODE
+	 		, A.MENU_NAME
+	 		, A.MENU_PRICE
+	 		, A.CATEGORY_CODE
+	 		, A.ORDERABLE_STATUS
+	 	FROM TBL_MENU A
+	 	WHERE A.ORDERABLE_STATUS = 'Y'
+	 </select>
+	 
+	 <!-- 2-1-2 <association> -->
+	 <!-- 따로 만든 resultMap을 사용하는 방법 -->
+	 <!-- <resultMap id="menuAndCategoryMap" type="com.dykim.mapperelement.common.MenuAndCategoryDTO">
+	 	<id property="code" column="MENU_CODE"/>
+		<result property="name" column="MENU_NAME"/>
+		<result property="price" column="MENU_PRICE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+		association은 항상 마지막에 몰아서 작성해주어야 함.
+		<association property="category" resultMap="categoryResultMap"/>
+	 </resultMap>
+	 <resultMap type="com.dykim.mapperelement.common.CategoryDTO" id="categoryResultMap">
+	 	<id property="code" column="CATEGORY_CODE"/>
+	 	<result property="name" column="CATEGORY_NAME"/>
+	 	<result property="refCategorycode" column="REF_CATEGORY_CODE"/>
+	 </resultMap> -->
+	 
+	 <!-- association 내에 id,result 작성하는 방법 -->
+	 <resultMap id="menuAndCategoryMap" type="com.dykim.mapperelement.common.MenuAndCategoryDTO">
+	 	<id property="code" column="MENU_CODE"/>
+		<result property="name" column="MENU_NAME"/>
+		<result property="price" column="MENU_PRICE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+		<association property="category" javaType="com.dykim.mapperelement.common.CategoryDTO">
+			<id property="code" column="CATEGORY_CODE"/>
+		 	<result property="name" column="CATEGORY_NAME"/>
+		 	<result property="refCategorycode" column="REF_CATEGORY_CODE"/>
+		</association>
+	 </resultMap>
+	 
+	 <select id ="selectResultMapAssociation" resultMap="menuAndCategoryMap">
+	 	SELECT
+	 		  A.MENU_CODE
+	 		, A.MENU_NAME
+	 		, A.MENU_PRICE
+	 		, B.CATEGORY_CODE
+	 		, B.CATEGORY_NAME
+	 		, B.REF_CATEGORY_CODE
+	 		, A.ORDERABLE_STATUS
+	 	FROM TBL_MENU A
+	 	JOIN TBL_CATEGORY B ON(A.CATEGORY_CODE = B.CATEGORY_CODE)
+	 	WHERE A.ORDERABLE_STATUS = 'Y'
+	 </select>
+	 
+	 <!-- 2-1-3. <collection -->
+	 <!-- 따로 만든 resultMap을 사용하는 방법  -->
+	 <resultMap type="com.dykim.mapperelement.common.CategoryAndMenuDTO" id="categoryAndMenuResultMap">
+	 	<id property="code" column="CATEGORY_CODE"/>
+	 	<result property="name" column="CATEGORY_NAME"/>
+	 	<result property="refCategorycode" column="REF_CATEGORY_CODE"/>
+	 	<collection property="menuList" resultMap="menuResultMap"/>
+	 </resultMap>
+	 
+	 <resultMap type="com.dykim.mapperelement.common.MenuDTO" id="menuResultMap">
+	 	<id property="code" column="MENU_CODE"/>
+		<result property="name" column="MENU_NAME"/>
+		<result property="price" column="MENU_PRICE"/>
+		<result property="categoryCode" column="CATEGORY_CODE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	 </resultMap>
+	 
+	 <select id="selectResultMapCollectionTest" resultMap="categoryAndMenuResultMap">
+		SELECT
+			  A.CATEGORY_CODE
+			, A.CATEGORY_NAME
+			, A.REF_CATEGORY_CODE
+			, B.MENU_CODE
+			, B.MENU_NAME
+			, B.MENU_PRICE
+			, B.CATEGORY_CODE
+			, B.ORDERABLE_STATUS
+		FROM TBL_CATEGORY A
+		LEFT JOIN TBL_MENU B ON(A.CATEGORY_CODE = B.CATEGORY_CODE)
+		ORDER BY A.CATEGORY_CODE
+	</select>
 </mapper>

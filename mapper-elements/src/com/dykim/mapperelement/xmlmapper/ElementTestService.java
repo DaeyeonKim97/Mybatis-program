@@ -6,6 +6,10 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
+import com.dykim.mapperelement.common.CategoryAndMenuDTO;
+import com.dykim.mapperelement.common.MenuAndCategoryDTO;
+import com.dykim.mapperelement.common.MenuDTO;
+
 public class ElementTestService {
 
 	public void selectCacheTest() {
@@ -31,6 +35,56 @@ public class ElementTestService {
 		
 		sqlSession.close();
 		
+	}
+
+	public void selectResultMap() {
+		SqlSession sqlSession = getSqlSession();
+		ElementTestMapper mapper = sqlSession.getMapper(ElementTestMapper.class);
+		
+		List<MenuDTO> menuList = mapper.selectResultMapTest();
+		
+		for(MenuDTO menu : menuList) {
+			System.out.println(menu);
+		}
+		
+		sqlSession.close();
+	}
+
+	public void selectResultMapConstructorTest() {
+		SqlSession sqlSession = getSqlSession();
+		
+		ElementTestMapper mapper = sqlSession.getMapper(ElementTestMapper.class);
+		
+		List<MenuDTO> menuList = mapper.selectResultMapConstructorTest();
+		
+		for(MenuDTO menu:menuList)
+			System.out.println(menu);
+		
+		sqlSession.close();
+	}
+
+	public void selectResultMapAssociationTest() {
+		SqlSession sqlSession = getSqlSession();
+		ElementTestMapper mapper = sqlSession.getMapper(ElementTestMapper.class);
+		
+		List<MenuAndCategoryDTO> menuList = mapper.selectResultMapAssociation();
+		
+		for(MenuAndCategoryDTO menu : menuList)
+			System.out.println(menu);
+		
+		sqlSession.close();
+	}
+
+	public void selectResultMapCollectionTest() {
+		SqlSession sqlSession = getSqlSession();
+		ElementTestMapper mapper = sqlSession.getMapper(ElementTestMapper.class);
+		
+		List<CategoryAndMenuDTO> categoryList = mapper.selectResultMapCollectionTest();
+		
+		for(CategoryAndMenuDTO category : categoryList) {
+			System.out.println(category);
+		}
+		sqlSession.close();
 	}
 	
 }
