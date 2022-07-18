@@ -25,7 +25,7 @@ public class Application {
 				resultMapSubMenu();
 				break;
 			case 3:
-				
+				elementTestService.selectSqlTest();
 				break;
 			case 4:
 				

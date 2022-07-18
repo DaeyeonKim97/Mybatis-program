@@ -192,4 +192,20 @@
 		LEFT JOIN TBL_MENU B ON(A.CATEGORY_CODE = B.CATEGORY_CODE)
 		ORDER BY A.CATEGORY_CODE
 	</select>
+	
+	<!-- <sql> 엘리먼트  -->
+	<sql id = "columns">
+		  MENU_CODE
+		, MENU_NAME
+		, MENU_PRICE
+		, CATEGORY_CODE
+		, ORDERABLE_STATUS
+	</sql>
+	
+	<select id="selectSqlTest" resultMap="menuResultMap2">
+		SELECT
+		<include refid="columns"/>
+		FROM TBL_MENU A
+		WHERE A.ORDERABLE_STATUS = 'Y'
+	</select>
 </mapper>
