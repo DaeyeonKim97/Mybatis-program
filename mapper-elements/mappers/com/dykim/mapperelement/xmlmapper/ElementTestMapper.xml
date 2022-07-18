@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace = "com.dykim.mapperelement.xmlmapper.ElementTestMapper">
+	<resultMap type="com.dykim.mapperelement.common.MenuDTO" id="menuResultMap">
+		<id property="code" column="MENU_CODE"/>
+		<result property="name" column="MENU_NAME"/>
+		<result property="price" column="MENU_PRICE"/>
+		<result property="categoryCode" column="CATEGORY_CODE"/>
+		<result property="orderableStatus" column="ORDERABLE_STATUS"/>
+	</resultMap>
+	
+	
+	<!-- mapper xml 에서 사용할 수 있는 엘리먼트는 총 9가지 이다. -->
+	<!-- 
+		<cache>, <cache-ref>, <resultMap>. <parameterMap>, <sql> sql을 만들어 내어 재사용할 수 있음.
+		<select>, <insert>, <update>, <delete>
+	 -->
+	<!-- 1. <cache> 엘리먼트 -->
+	<!-- 
+		cache, cache-ref 엘리먼트는 캐시를 설정하는 엘리먼트이다.
+		cache는 현재 네임스페이스에 대한 캐시 설정이고, cache-ref는 다른 네임스페이스에 대한 캐시 설정을 참조할 때 사용한다.
+		
+		캐시란?
+		컴퓨터 과학에서 데이터나 값을 미리 복사해놓은 임시 장소를 가리킨다.
+		캐시 접근 시간에 비해 원래 데이터를 접근하는 시간이 오래 걸리는 경우나,
+		값을 다시 계산하는 시간을 절약하고 시픙ㄴ 경우 사용한다.
+		캐시에 데이터를 미리 복사해 놓으면 계산이나 접근 시간 없이 빠른 속도로 데이터에 접근할 수 있다.#
+	 -->
+	 
+	 <cache eviction="LRU" flushInterval="1000" size="512" readOnly="true"/>
+	 <!-- 
+	 	사용 가능 속성
+	 	1. eviction : 캐시 알고리즘 속성이며 디폴트는 LRU이다. FIFO, SOFT, WEAK로도 설정 가능하다.
+	 	2. flushInterval : 설정된 캐시를 얼마 동안 유지할지를 밀리초 단위로 설정하며 양수이어야 한다.
+	 	3. size : 캐시에 저장할 객체의 수를 지정한다. default는 1024이다.
+	 	4. readonly : 읽기만 가능한 경우 캐시의 데이터의 변경이 되지 않는다.
+	  -->
+	  <!-- 디폴트 설정
+	  	1. 매퍼 xml의 모든 select 구문의 결과를 캐싱한다.
+	  	2. 매퍼 xml의 insert, update, delete는 모두 캐시를 지운다.
+	  	3. 가장 오랫동안 사용하지 않는 캐시를 지우는 알고리즘(LRU - Least Recently Used)을 사용한다.
+	  	4. 애플리케이션이 실행되는 동안 캐시를 유지한다. 특정 지점에 사라지거나 하지 않는다.
+	  	5. 캐시는 최대 1024개 까지 저장한다.
+	  	6. 캐시는 읽기/쓰기 모두 가능하다.
+	   -->
+	
+	<select id="selectCacheTest" resultType="java.lang.String">
+		SELECT
+			A.MENU_NAME
+		FROM TBL_MENU A
+	</select>
+	
+</mapper>

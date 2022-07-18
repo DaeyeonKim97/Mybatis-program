@@ -6,10 +6,6 @@
  <configuration>
  	
  	<properties resource = "connection-info.properties"/>
- 	
- 	<typeAliases>
- 		<typeAlias type="com.dykim.dynamic.common.SearchCriteria" alias="SearchCriteria"/>
- 	</typeAliases>
  
  	<environments default="dev">
  		<environment id = "dev">
@@ -25,5 +21,8 @@
  		</environment>
  	</environments>
  	
+ 	<mappers>
+ 		<package name ="com.dykim.mapperelement.xmlmapper"/>
+ 	</mappers>
  	
  </configuration>
